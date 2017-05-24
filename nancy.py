@@ -1,3 +1,4 @@
+import sys
 import matplotlib.pyplot as plt
 
 class Grid(object):
@@ -114,7 +115,7 @@ class Grid(object):
         return None
 
 
-    def graph(self):
+    def graph(self, save_name):
         col_pairs = []
         row_pairs = []
         for node in self.nodes:
@@ -126,13 +127,19 @@ class Grid(object):
 
 
         for col_pair in col_pairs:
-            plt.plot(col_pair[0], col_pair[1])
+            plt.plot(col_pair[0], col_pair[1], 'black')
         for row_pair in row_pairs:
-            plt.plot(row_pair[0], row_pair[1])
+            plt.plot(row_pair[0], row_pair[1], 'black')
 
-
+        plt.tick_params(
+            axis='both',
+            which='both',
+            bottom='off', top='off', left='off', right='off',
+            labelbottom='off',labelleft='off'
+            )
         plt.xlim ([0, self.n + 1])
         plt.ylim([0, self.n + 1])
+        plt.savefig('grid_images/' + save_name + '.png', bbox_inches='tight')
         plt.show()
 
 
@@ -167,18 +174,41 @@ class Node(object):
          self.in_orientation, self.out_orientation, self.col_key)
 
 
+###############################################
+###############################################
 
-nodes = []
-n = int(raw_input().strip())
-grid = Grid([], n / 2)
+# USAGE:
+# python nancy.py <test file name> <save name>
+
+###############################################
+###############################################
 
 
-for _ in xrange(n):
-    row, col = [int(val) for val in raw_input().strip().split(' ')]
-    grid.add_node(Node(row, col))
+def main():
 
-grid.graph()
-grid.orient()
-grid.order_up_cols()
-grid.midgrid()
-grid.graph()
+    clp = sys.argv
+    test_name = clp[1]
+    save_name = clp[2]
+
+    f = open('test/' + test_name, 'r')
+    data = f.readlines()
+    f.close()
+
+    nodes = []
+    n = int(data[0].strip())
+    grid = Grid([], n / 2)
+
+
+    for line in data[1:]:
+        row, col = [int(val) for val in line.strip().split(' ')]
+        grid.add_node(Node(row, col))
+
+    grid.graph(save_name + "-knot")
+    grid.orient()
+    grid.order_up_cols()
+    grid.midgrid()
+    grid.graph(save_name + "-grid")
+
+if __name__ == "__main__":
+    main()
+
